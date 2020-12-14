@@ -85,9 +85,8 @@
 
             window.addEventListener('keypress', function(e) {
                 console.log(e.keyCode)
-                if (e.keyCode === 115) //s
+                if (e.keyCode === 115 || e.keyCode === 101 ) //s
                 {
-                    console.log(`Player ${player_number} pressed S key` )
                     socket.emit('switch_to_other_player', player_number)
                 }
             })
@@ -108,12 +107,14 @@
                 player_number = number;
                 const player_data = $('#player_data');
                 
+                let html = `<h4>You're the RED player - press E to end turn</h4>` 
                 if (player_number == 1) {
-                    player_data.text(`you're the red player`)
+                    html = `<h4>You're the RED player - press E to end turn</h4>`
                 }
                 else {
-                    player_data.text(`you're the green player`)
+                    html = `<h4>You're the GREEN player - press E to end turn</h4>`
                 }
+                player_data.html(html)
             })
 
             socket.on('game_update', (game_state) => {
@@ -168,28 +169,11 @@
                 () =>{
                     socket.emit('request_update')
                 },
-                30
+                200
             )
             
 
-            $('.cell')
-            .click(addOrFlip_fn)
-
-
-            $('red_cirlce')
-            .click(addOrFlip_fn)
-
-            $('green_cirlce')
-            .click(addOrFlip_fn)
-            
-            
-            function addOrFlip_fn() {
-                const id = $(this).attr('id')
-                const row =  parseInt(id.split('_')[1])
-                const col =  parseInt(id.split('_')[2])
-                console.log(`clicking ${row} ${col}`)
-                socket.emit('add_or_flip_coin', {row, col, player_number})
-            }
+           
         })
     </script>
 </html>
