@@ -4,3 +4,4 @@ const CELL_TYPES = {
     CONTAINS_GREEN: 2
 }
 module.exports = CELL_TYPES
+

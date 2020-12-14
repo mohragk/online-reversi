@@ -66,7 +66,6 @@ io.sockets.on('connection', (socket) => {
             runningGames[game_id].flipCoin(msg.row, msg.col)
             socket.emit('game_update',  runningGames[game_id])
         }
-
     })
 
     socket.on('add_or_flip_coin', (msg) => {
@@ -75,7 +74,22 @@ io.sockets.on('connection', (socket) => {
             runningGames[game_id].addOrFlipCoin(msg.row, msg.col, msg.player_number)
             socket.emit('game_update',  runningGames[game_id])
         }
+    })
 
+    socket.on('remove_coin', (pos) => {
+        const game_id = users[socket.id].game_id
+        if (game_id) {
+            runningGames[game_id].removeCoin(pos)
+        }
+    })
+
+    socket.on('switch_to_other_player', from_player_number => {
+        let other_player_number = from_player_number == 1 ? 2 : 1
+        console.log(`New player number: ${other_player_number}`)
+        const game_id = users[socket.id].game_id
+        if (game_id) {
+            runningGames[game_id].setPlayerNumber(other_player_number)
+        }
     })
 
 
@@ -113,7 +127,7 @@ function addPlayerToGame(clients, player_number, game_id) {
     socket.emit('player_number', player_number)
 
     
-    console.log(`Adding player to game(${game_id}) with id: ${player_socket_id}`)
+    console.log(`Adding player ${player_number} to game(${game_id}) with id: ${player_socket_id}`)
     console.log(users)
 }
     

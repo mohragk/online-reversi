@@ -35,7 +35,8 @@
     <script>
         let socket
         let player_number
-        const cell_size_pixels = 48
+        let your_turn = false
+        let cell_size_pixels = 48
         let mouse_position
 
         function drawCircle(context, x, y, radius) {
@@ -49,9 +50,10 @@
             context.fill();
         } 
 
-        jQuery(document).ready( function($) {
+        jQuery(document).ready(async function($) {
 
-            socket = io.connect('')
+            socket = await io.connect('')
+
 
             var canvas = document.getElementById('grid_canvas');
             var ctx = canvas.getContext('2d');
@@ -61,13 +63,34 @@
             }, false);
 
             canvas.addEventListener("click", function(e) {
+                
+                
                 // Convert mouse coords to grid coords
                 const col = Math.floor(mouse_position.x / cell_size_pixels)
                 const row = Math.floor(mouse_position.y / cell_size_pixels)
 
-                socket.emit('add_or_flip_coin', {row, col, player_number})
+                if (e.button === 0) {
+                    socket.emit('add_or_flip_coin', {row, col, player_number})
+                }
+                
 
             }, false);
+
+            canvas.addEventListener('contextmenu', function(e) {
+                // Convert mouse coords to grid coords
+                const col = Math.floor(mouse_position.x / cell_size_pixels)
+                const row = Math.floor(mouse_position.y / cell_size_pixels)
+                socket.emit('remove_coin', {row, col})
+            })
+
+            window.addEventListener('keypress', function(e) {
+                console.log(e.keyCode)
+                if (e.keyCode === 115) //s
+                {
+                    console.log(`Player ${player_number} pressed S key` )
+                    socket.emit('switch_to_other_player', player_number)
+                }
+            })
 
             function getMousePos(canvas, e) {
                 var rect = canvas.getBoundingClientRect();
@@ -95,36 +118,49 @@
 
             socket.on('game_update', (game_state) => {
                 if (game_state !== null) {
-                    // update grid
-                    const { grid } = game_state
-                    for (let row = 0 ; row < game_state.grid_dim; row++) {
-                        for (let col = 0 ; col < game_state.grid_dim; col++) {
+                    var canvas_w = canvas.width;
+                    var canvas_h = canvas.height;
+                    ctx.clearRect(0,0, canvas_w, canvas_h)
+
+                    
+                    
+                    // update and draw grid
+                    const { grid, grid_dim } = game_state
+                    cell_size_pixels = canvas_h / grid_dim
+                    for (let row = 0 ; row < grid_dim; row++) {
+                        for (let col = 0 ; col < grid_dim; col++) {
                             const margin = 8
                             const half_margin = margin / 2
                             let x = col * cell_size_pixels + (0.5 * half_margin)
                             let y = row * cell_size_pixels + (0.5 * half_margin)
-
-                            const cell_value = grid[row * game_state.grid_dim + col]
+                            
+                            const cell_value = grid[row * grid_dim + col]
                             ctx.fillStyle = 'black'
                             ctx.fillRect(x, y, cell_size_pixels - half_margin, cell_size_pixels - half_margin)
-
+                            
                             x += 0.5 * half_margin
                             y += 0.5 * half_margin
                             if (cell_value == 1) {
                                 ctx.fillStyle = 'red'
-                                
                                 drawCircle(ctx, x, y, cell_size_pixels - margin)
                             }
                             else if (cell_value == 2) {
-                                ctx.fillStyle = 'green'
-                            
+                                ctx.fillStyle = 'green' 
                                 drawCircle(ctx, x, y, cell_size_pixels - margin)
                             }
-
-                            
                         }
                     }
                     
+                    const is_your_turn = (game_state.current_player_number === player_number)
+                    
+
+                    
+                    if (is_your_turn) {
+                        // draw border
+                        ctx.strokeStyle = player_number === 1 ? 'red' : 'green'
+                        ctx.lineWidth = 8 * 4;
+                        ctx.strokeRect(0,0, canvas_w, canvas_h )
+                    }
                 }
             })
 
@@ -132,7 +168,7 @@
                 () =>{
                     socket.emit('request_update')
                 },
-                1000
+                30
             )
             
 
