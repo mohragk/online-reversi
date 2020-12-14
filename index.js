@@ -60,7 +60,6 @@ io.sockets.on('connection', (socket) => {
     } )
 
     socket.on('flip_coin', (msg) => {
-        console.log(msg)
         const game_id = users[socket.id].game_id
         if (game_id) {
             runningGames[game_id].flipCoin(msg.row, msg.col)
@@ -70,7 +69,6 @@ io.sockets.on('connection', (socket) => {
     })
 
     socket.on('add_or_flip_coin', (msg) => {
-        console.log(msg)
         const game_id = users[socket.id].game_id
         if (game_id) {
             runningGames[game_id].addOrFlipCoin(msg.row, msg.col, msg.player_number)

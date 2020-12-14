@@ -1,6 +1,11 @@
 <html>
     <head>
         <title>Reversi</title>
+        <style>
+            .cell {
+
+            }
+        </style>
     </head>
     <body>
         <script src="/socket.io/socket.io.js"></script>
@@ -12,7 +17,7 @@
         </script>
       
       <div id= "main">
-
+        <div id="player_data"></div>
       </div>
     
 
@@ -23,7 +28,6 @@
         jQuery(document).ready( function($) {
 
             socket = io.connect('')
-
 
             const grid_table = $('<table>').appendTo('#main')
             for (let row = 0; row < 8; row++) {
@@ -50,10 +54,15 @@
             })
 
             socket.on('player_number', number => {
-                player_number = number
+                player_number = number;
+                const player_data = $('#player_data');
+                
+                const color = player_number == 0 ? 'red' : 'green'
+                player_data.text(`You're the ${color} player`)
             })
 
             socket.on('game_update', (game_state) => {
+                // update grid
                 for (let row = 0; row < 8; row++) {
                     for (let col = 0; col < 8; col++) {
                         const td = $(`#cell_${row}_${col}`)
