@@ -47,16 +47,27 @@ io.sockets.on('connection', (socket) => {
         delete users[socket.id]
         delete allClients[socket.id]
         console.log(users)
-        console.log(runningGames)
     } )
 
     socket.on('leave', () => {
         console.log(`Elvis has left the building`)
     })
 
+    socket.on('request_update', () => {
+        const game_id = users[socket.id].game_id
+        const game = runningGames[game_id]
+        socket.emit('game_update', game)
+    } )
+
+    socket.on('flip_coin', (msg) => {
+        console.log(msg)
+        const game_id = users[socket.id].game_id
+        runningGames[game_id].flipCoin(msg.row, msg.col)
+
+    })
+
     createGameSessionForWaiting()
     console.log(users)
-    console.log(runningGames)
 })
 
 function createGameSessionForWaiting() {

@@ -22,6 +22,17 @@
             socket.on('waiting', (msg)=> {
                 console.log(msg)
             })
+
+            socket.on('game_update', (game_state) => {
+                console.log(game_state.grid)
+            })
+
+            setInterval( () => {
+                socket.emit( 'flip_coin', {row: 3, col: 4})
+                socket.emit('request_update')
+            }
+               , 1000
+            )
         })
     </script>
 </html>
