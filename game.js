@@ -57,3 +57,15 @@ Game.prototype.flipCoin = function(row, col) {
         this.grid[ row * this.grid_dim + col ] = new_coin_side
     }
 }
+
+Game.prototype.addOrFlipCoin = function(row, col, player_number) {
+    let current_coin_side = this.grid[ row * this.grid_dim + col ]
+    if (current_coin_side !== CELL_TYPES.EMPTY) {
+        const new_coin_side = current_coin_side == CELL_TYPES.CONTAINS_GREEN ? CELL_TYPES.CONTAINS_RED :  CELL_TYPES.CONTAINS_GREEN
+        this.grid[ row * this.grid_dim + col ] = new_coin_side
+    }
+    else {
+        const new_coin_side = player_number == 0 ? CELL_TYPES.CONTAINS_GREEN : CELL_TYPES.CONTAINS_RED
+        this.grid[ row * this.grid_dim + col ] = new_coin_side
+    }
+}

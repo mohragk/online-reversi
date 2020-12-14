@@ -22,15 +22,21 @@
         
         jQuery(document).ready( function($) {
 
+            socket = io.connect('')
+
+
             const grid_table = $('<table>').appendTo('#main')
             for (let row = 0; row < 8; row++) {
                 const tr = $('<tr>').attr('id', `row_${row}`)
+                    .css({height: '48px '})
                 grid_table.append(
                     tr
                 )
                 for (let col = 0; col < 8; col++) {
                     const td = $('<td>').attr('id', `cell_${row}_${col}`)
-                        .text('0')
+                        .css({width: '48px'})
+                        .attr('class', 'cell')
+                        .css({background: 'black'})
                     tr.append(
                         td
                     )
@@ -38,7 +44,6 @@
             }
                 
 
-            socket = io.connect('')
             
             socket.on('waiting', (msg)=> {
                 console.log(msg)
@@ -53,19 +58,33 @@
                     for (let col = 0; col < 8; col++) {
                         const td = $(`#cell_${row}_${col}`)
                         const value = game_state.grid[ row * 8 + col ]
-                        td.text(value)
+                        let css_bg_color = 'black'
+                        if (value == 1) css_bg_color = 'green'
+                        if (value == 2) css_bg_color = 'red'
+                        
+                        td.css({
+                            background: css_bg_color
+                        })
                     }
                 }
             })
 
-            setInterval( () => {
-                if (player_number == 1) {
-                    socket.emit( 'flip_coin', {row: 3, col: 4})
-                }
-                socket.emit('request_update')
-            }
-               , 1000
+            setInterval(
+                () =>{
+                    socket.emit('request_update')
+                },
+                100
             )
+            
+
+            $('.cell')
+            .click(function() {
+                const id = $(this).attr('id')
+                const row =  parseInt(id.split('_')[1])
+                const col =  parseInt(id.split('_')[2])
+                console.log(`clicking ${row} ${col}`)
+                socket.emit('add_or_flip_coin', {row, col, player_number})
+            })
         })
     </script>
 </html>

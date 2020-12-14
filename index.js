@@ -64,9 +64,22 @@ io.sockets.on('connection', (socket) => {
         const game_id = users[socket.id].game_id
         if (game_id) {
             runningGames[game_id].flipCoin(msg.row, msg.col)
+            socket.emit('game_update',  runningGames[game_id])
         }
 
     })
+
+    socket.on('add_or_flip_coin', (msg) => {
+        console.log(msg)
+        const game_id = users[socket.id].game_id
+        if (game_id) {
+            runningGames[game_id].addOrFlipCoin(msg.row, msg.col, msg.player_number)
+            socket.emit('game_update',  runningGames[game_id])
+        }
+
+    })
+
+
 
     createGameSessionForWaiting()
     console.log(users)
@@ -89,15 +102,15 @@ function createGameSessionForWaiting() {
 }
 
 function addPlayerToGame(clients, player_number, game_id) {
-    clients[player_number].leave(ROOM_TYPES.waiting)
+    const socket = clients[player_number]
+    socket.leave(ROOM_TYPES.waiting)
     const game_room_name = ROOM_TYPES.game+game_id
-    clients[player_number].join(game_room_name)
+    socket.join(game_room_name)
 
-    const player_socket_id = clients[player_number].id
+    const player_socket_id = socket.id
     users[player_socket_id].player_side = player_number
     users[player_socket_id].game_id = game_id
 
-    const socket = clients[player_number]
     socket.emit('player_number', player_number)
 
     console.log(`Adding player to game(${game_id}) with id: ${player_socket_id}`)
