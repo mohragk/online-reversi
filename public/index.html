@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <title>Reversi</title>
+    </head>
+    <body>
+        <div>Pis</div>
+        <script src="/socket.io/socket.io.js"></script>
+    </body>
+        <script
+            src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
+            crossorigin="anonymous">
+        </script>
+      
+
+    <script>
+        let socket
+        
+        jQuery(document).ready( function($) {
+            socket = io.connect('')
+            
+            socket.on('waiting', (msg)=> {
+                console.log(msg)
+            })
+        })
+    </script>
+</html>

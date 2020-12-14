@@ -1,0 +1,21 @@
+{
+  "name": "online-reversi",
+  "version": "1.0.0",
+  "description": "Simple online Reversi clone",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "Reversi",
+    "Game",
+    "Mulitplayer"
+  ],
+  "author": "Sander Vermeer",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^3.0.4",
+    "uuid": "^8.3.2"
+  }
+}
