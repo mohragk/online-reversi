@@ -28,6 +28,7 @@
       
       <div id= "main">
         <div id="player_data">Waiting for other player</div>
+        <div id="player_score"></div>
         <canvas id="grid_canvas" width="720" height="720"></canvas>
       </div>
     
@@ -38,6 +39,7 @@
         let your_turn = false
         let cell_size_pixels = 48
         let mouse_position
+        let player_score
 
         function drawCircle(context, x, y, radius) {
             context.beginPath();
@@ -118,12 +120,16 @@
             })
 
             socket.on('game_update', (game_state) => {
+
+                const player_score_div = $('#player_score').text(`Score: ${player_score}` )
+
                 if (game_state !== null) {
                     var canvas_w = canvas.width;
                     var canvas_h = canvas.height;
                     ctx.clearRect(0,0, canvas_w, canvas_h)
 
-                    
+                    // reset
+                    player_score = 0
                     
                     // update and draw grid
                     const { grid, grid_dim } = game_state
@@ -136,12 +142,16 @@
                             let y = row * cell_size_pixels + (0.5 * half_margin)
                             
                             const cell_value = grid[row * grid_dim + col]
+                            if (cell_value === player_number) player_score++
                             ctx.fillStyle = 'black'
                             ctx.fillRect(x, y, cell_size_pixels - half_margin, cell_size_pixels - half_margin)
                             
+
+
                             x += 0.5 * half_margin
                             y += 0.5 * half_margin
                             if (cell_value == 1) {
+
                                 ctx.fillStyle = 'red'
                                 drawCircle(ctx, x, y, cell_size_pixels - margin)
                             }
