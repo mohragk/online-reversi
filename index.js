@@ -1,5 +1,6 @@
 const UUID = require('uuid');
 const Game = require('./game.js')
+const CELL_TYPES = require('./public/cell_types')
 
 const express = require('express')
 const app = express()
@@ -89,8 +90,8 @@ function createGameSessionForWaiting() {
     if (room_clients.length >= 2) {
        
         const game_uuid = UUID.v4();
-        addPlayerToGame( room_clients, 0, game_uuid)        
-        addPlayerToGame( room_clients, 1, game_uuid)
+        addPlayerToGame( room_clients, CELL_TYPES.CONTAINS_RED, game_uuid)        
+        addPlayerToGame( room_clients, CELL_TYPES.CONTAINS_GREEN, game_uuid)
         game_count++
         
         const game = new Game(game_uuid)
@@ -100,7 +101,7 @@ function createGameSessionForWaiting() {
 }
 
 function addPlayerToGame(clients, player_number, game_id) {
-    const socket = clients[player_number]
+    const socket = clients[player_number - 1]
     socket.leave(ROOM_TYPES.waiting)
     const game_room_name = ROOM_TYPES.game+game_id
     socket.join(game_room_name)
@@ -111,7 +112,9 @@ function addPlayerToGame(clients, player_number, game_id) {
 
     socket.emit('player_number', player_number)
 
+    
     console.log(`Adding player to game(${game_id}) with id: ${player_socket_id}`)
+    console.log(users)
 }
     
 function leaveGame(socket) {

@@ -1,8 +1,4 @@
-const CELL_TYPES = {
-    EMPTY: 0,
-    CONTAINS_RED: 1,
-    CONTAINS_GREEN: 2
-}
+const CELL_TYPES = require('./public/cell_types')
 
 var Game = function(id) {
     this.id = id
@@ -12,7 +8,7 @@ var Game = function(id) {
 
     this.reset()
 }
-module.exports =  Game;
+module.exports = Game;
 
 Game.prototype.getId = function() {
     return this.id
@@ -65,7 +61,7 @@ Game.prototype.addOrFlipCoin = function(row, col, player_number) {
         this.grid[ row * this.grid_dim + col ] = new_coin_side
     }
     else {
-        const new_coin_side = player_number == 0 ? CELL_TYPES.CONTAINS_GREEN : CELL_TYPES.CONTAINS_RED
+        const new_coin_side = player_number 
         this.grid[ row * this.grid_dim + col ] = new_coin_side
     }
 }

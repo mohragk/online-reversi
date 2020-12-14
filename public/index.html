@@ -2,8 +2,18 @@
     <head>
         <title>Reversi</title>
         <style>
-            .cell {
-
+            .red_circle, .green_circle {
+                background-color: red;
+            display:block;
+            height:42px;
+            width:42px;
+            border-radius:50%;
+           
+            margin:auto;
+            
+            }
+            .green_circle {
+                background-color: green;
             }
         </style>
     </head>
@@ -18,36 +28,54 @@
       
       <div id= "main">
         <div id="player_data">Waiting for other player</div>
+        <canvas id="grid_canvas" width="720" height="720"></canvas>
       </div>
     
 
     <script>
         let socket
         let player_number
-        
+        const cell_size_pixels = 48
+        let mouse_position
+
+        function drawCircle(context, x, y, radius) {
+            context.beginPath();
+            
+            // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
+            const new_x = x + (0.5 * radius)
+            const new_y = y + (0.5 * radius)
+            context.arc(new_x, new_y, 0.5*radius, 0, Math.PI*2, true);
+            context.closePath();
+            context.fill();
+        } 
+
         jQuery(document).ready( function($) {
 
             socket = io.connect('')
 
-            const grid_table = $('<table>').appendTo('#main')
-            for (let row = 0; row < 8; row++) {
-                const tr = $('<tr>').attr('id', `row_${row}`)
-                    .css({height: '48px '})
-                grid_table.append(
-                    tr
-                )
-                for (let col = 0; col < 8; col++) {
-                    const td = $('<td>').attr('id', `cell_${row}_${col}`)
-                        .css({width: '48px'})
-                        .attr('class', 'cell')
-                        .css({background: 'black'})
-                    tr.append(
-                        td
-                    )
-                }
-            }
-                
+            var canvas = document.getElementById('grid_canvas');
+            var ctx = canvas.getContext('2d');
+           
+            canvas.addEventListener('mousemove', function(e) {
+                mouse_position = getMousePos(canvas, e);
+            }, false);
 
+            canvas.addEventListener("click", function(e) {
+                // Convert mouse coords to grid coords
+                const col = Math.floor(mouse_position.x / cell_size_pixels)
+                const row = Math.floor(mouse_position.y / cell_size_pixels)
+
+                socket.emit('add_or_flip_coin', {row, col, player_number})
+
+            }, false);
+
+            function getMousePos(canvas, e) {
+                var rect = canvas.getBoundingClientRect();
+                return {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+            }
             
             socket.on('waiting', (msg)=> {
                 console.log(msg)
@@ -57,26 +85,46 @@
                 player_number = number;
                 const player_data = $('#player_data');
                 
-                const color = player_number == 0 ? 'red' : 'green'
-                player_data.text(`You're the ${color} player`)
+                if (player_number == 1) {
+                    player_data.text(`you're the red player`)
+                }
+                else {
+                    player_data.text(`you're the green player`)
+                }
             })
 
             socket.on('game_update', (game_state) => {
                 if (game_state !== null) {
                     // update grid
-                    for (let row = 0; row < 8; row++) {
-                        for (let col = 0; col < 8; col++) {
-                            const td = $(`#cell_${row}_${col}`)
-                            const value = game_state.grid[ row * 8 + col ]
-                            let css_bg_color = 'black'
-                            if (value == 1) css_bg_color = 'green'
-                            if (value == 2) css_bg_color = 'red'
+                    const { grid } = game_state
+                    for (let row = 0 ; row < game_state.grid_dim; row++) {
+                        for (let col = 0 ; col < game_state.grid_dim; col++) {
+                            const margin = 8
+                            const half_margin = margin / 2
+                            let x = col * cell_size_pixels + (0.5 * half_margin)
+                            let y = row * cell_size_pixels + (0.5 * half_margin)
+
+                            const cell_value = grid[row * game_state.grid_dim + col]
+                            ctx.fillStyle = 'black'
+                            ctx.fillRect(x, y, cell_size_pixels - half_margin, cell_size_pixels - half_margin)
+
+                            x += 0.5 * half_margin
+                            y += 0.5 * half_margin
+                            if (cell_value == 1) {
+                                ctx.fillStyle = 'red'
+                                
+                                drawCircle(ctx, x, y, cell_size_pixels - margin)
+                            }
+                            else if (cell_value == 2) {
+                                ctx.fillStyle = 'green'
                             
-                            td.css({
-                                background: css_bg_color
-                            })
+                                drawCircle(ctx, x, y, cell_size_pixels - margin)
+                            }
+
+                            
                         }
                     }
+                    
                 }
             })
 
@@ -84,18 +132,28 @@
                 () =>{
                     socket.emit('request_update')
                 },
-                100
+                1000
             )
             
 
             $('.cell')
-            .click(function() {
+            .click(addOrFlip_fn)
+
+
+            $('red_cirlce')
+            .click(addOrFlip_fn)
+
+            $('green_cirlce')
+            .click(addOrFlip_fn)
+            
+            
+            function addOrFlip_fn() {
                 const id = $(this).attr('id')
                 const row =  parseInt(id.split('_')[1])
                 const col =  parseInt(id.split('_')[2])
                 console.log(`clicking ${row} ${col}`)
                 socket.emit('add_or_flip_coin', {row, col, player_number})
-            })
+            }
         })
     </script>
 </html>
