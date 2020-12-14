@@ -62,18 +62,20 @@
             })
 
             socket.on('game_update', (game_state) => {
-                // update grid
-                for (let row = 0; row < 8; row++) {
-                    for (let col = 0; col < 8; col++) {
-                        const td = $(`#cell_${row}_${col}`)
-                        const value = game_state.grid[ row * 8 + col ]
-                        let css_bg_color = 'black'
-                        if (value == 1) css_bg_color = 'green'
-                        if (value == 2) css_bg_color = 'red'
-                        
-                        td.css({
-                            background: css_bg_color
-                        })
+                if (game_state !== null) {
+                    // update grid
+                    for (let row = 0; row < 8; row++) {
+                        for (let col = 0; col < 8; col++) {
+                            const td = $(`#cell_${row}_${col}`)
+                            const value = game_state.grid[ row * 8 + col ]
+                            let css_bg_color = 'black'
+                            if (value == 1) css_bg_color = 'green'
+                            if (value == 2) css_bg_color = 'red'
+                            
+                            td.css({
+                                background: css_bg_color
+                            })
+                        }
                     }
                 }
             })
