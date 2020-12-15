@@ -87,7 +87,7 @@
             var canvas = document.getElementById('grid_canvas');
             var ctx = canvas.getContext('2d');
            
-            $('body').bind('touchmove', function(event) { event.preventDefault() }); // turns off
+            $('#canvas').bind('touchmove', function(event) { event.preventDefault() }); // turns off
 
 
             canvas.addEventListener('mousemove', function(e) {
