@@ -87,7 +87,6 @@ io.sockets.on('connection', (socket) => {
 
     socket.on('switch_to_other_player', from_player_number => {
         let other_player_number = from_player_number == 1 ? 2 : 1
-        console.log(`New player number: ${other_player_number}`)
         const game_id = users[socket.id].game_id
         if (game_id) {
             runningGames[game_id].setPlayerNumber(other_player_number)
@@ -97,7 +96,6 @@ io.sockets.on('connection', (socket) => {
 
 
     createGameSessionForWaiting()
-    console.log(users)
 })
 
 function getGameFromSocketId(users, socket_id) {
@@ -119,6 +117,8 @@ function createGameSessionForWaiting() {
         runningGames[game_uuid] = game    
     }
     
+    console.log(`Current active users:`)
+    console.log(users)
 }
 
 function addPlayerToGame(clients, player_number, game_id) {
@@ -135,7 +135,7 @@ function addPlayerToGame(clients, player_number, game_id) {
 
     
     console.log(`Adding player ${player_number} to game(${game_id}) with id: ${player_socket_id}`)
-    console.log(users)
+    
 }
     
 function leaveGame(socket) {
@@ -162,6 +162,9 @@ function leaveGame(socket) {
 
             leaveGame(other_socket);
             other_socket.join(ROOM_TYPES.waiting)
+
+            console.log(`Current active users:`)
+            console.log(users)
         }
     }
 }

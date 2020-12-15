@@ -57,6 +57,7 @@
         let cell_size_pixels = 48
         let mouse_position
         let player_score
+        const game_state_poll_rate_hz = 5
 
         function drawCircle(context, x, y, radius) {
             context.beginPath();
@@ -137,11 +138,17 @@
                 };
             }
 
+            $('#end_turn_button').click(function(e) {
+                e.preventDefault()
+                socket.emit('switch_to_other_player', player_number)
+
+            })
+
 
             // SOCKET STUFF
             
             socket.on('waiting', (msg)=> {
-               
+               // handle waiting, i guess
             })
 
             socket.on('game_ended', function(msg) {
@@ -159,6 +166,7 @@
                 ctx.fillStyle = 'black'
                 ctx.fillText("No other player available", canvas_w/2 , canvas_h/2);
 
+                player_score = 0;
             })
 
             socket.on('player_number', number => {
@@ -180,6 +188,11 @@
                     $('<h4>').text(message)
                 )
             })
+
+            setInterval( () => { 
+                socket.emit('request_update')
+            }, 1000/game_state_poll_rate_hz )
+            
 
             socket.on('game_update', (game_state) => {
 
@@ -226,9 +239,8 @@
                     
                     your_turn = (game_state.current_player_number === player_number)
                     
+                    $('#end_turn_button').toggle(your_turn)
 
-                    $('#extra_message').remove()
-                    
                     if (your_turn) {
                         // draw border
                         ctx.strokeStyle = player_number === 1 ? 'red' : 'green'
@@ -237,20 +249,13 @@
 
                         //const extra_message = $('<h4>').text('Press E to end turn').attr('id', 'extra_message')
                         //$('#main').append(extra_message)
+
+                        //$('#end_turn_button').toggle(true)
                     }
                 }
             })
 
-            setInterval( () => { 
-                socket.emit('request_update')
-            }, 200 )
-            
-
-            $('#end_turn_button').click(function(e) {
-                e.preventDefault()
-                socket.emit('switch_to_other_player', player_number)
-
-            })
+           
 
            
         })
