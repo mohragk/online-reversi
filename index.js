@@ -78,10 +78,10 @@ io.sockets.on('connection', (socket) => {
         }
     })
 
-    socket.on('remove_coin', (pos) => {
+    socket.on('remove_coin', (player_data) => {
         const game = getGameFromSocketId(users, socket.id)
         if (game) {
-            game.removeCoin(pos)
+            game.removeCoin(player_data.pos, player_data.player_number)
         }
     })
 

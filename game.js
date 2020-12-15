@@ -59,7 +59,10 @@ Game.prototype.setPlayerNumber = function(player_number) {
 }
 
 
-Game.prototype.removeCoin = function(grid_pos) {
+Game.prototype.removeCoin = function(grid_pos, player_number) {
+    // Not allowed to change board when not player's turn
+    if (player_number !== this.current_player_number) return
+ 
     let current_coin_side = this.grid[ grid_pos.row * this.grid_dim + grid_pos.col ]
     if (current_coin_side !== CELL_TYPES.EMPTY) {
 

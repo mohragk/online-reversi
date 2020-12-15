@@ -121,7 +121,7 @@
                 }
                 
                 if ( isDoubleTap() ) {
-                    socket.emit('remove_coin', {row, col})
+                    socket.emit('remove_coin', {pos: {row, col}, player_number })
                 }
             }, false);
 
@@ -160,7 +160,7 @@
             // SOCKET STUFF
             
             socket.on('waiting', (msg)=> {
-               // handle waiting, i guess
+               // $('#player_data').text('Waiting for other player')
             })
 
             socket.on('game_ended', function(msg) {
@@ -177,11 +177,15 @@
                 ctx.textAlign = "center"
                 ctx.fillStyle = 'black'
                 ctx.fillText("No other player available", canvas_w/2 , canvas_h/2);
-
+                
                 player_score = 0;
+
                 $('#end_turn_button')
-                .prop('disabled', true)
-                .text(BUTTON_STATES_TEXT.WAIT)
+                    .prop('disabled', true)
+                    .text(BUTTON_STATES_TEXT.WAIT)
+                
+                $('#player_data').text('Waiting for other player')
+                $('#player_score').text('')
             })
 
             socket.on('player_number', number => {
