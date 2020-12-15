@@ -14,8 +14,6 @@ var Game = function(id) {
 
     this.current_player_number = CELL_TYPES.CONTAINS_RED 
     this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
-    this.current_player_flip_direction = {row_dir: 0, col_dir: 0}
-    this.current_player_flip_history = [] 
 
     this.reset()
 }
@@ -57,7 +55,6 @@ Game.prototype.reset = function() {
 
 Game.prototype.setPlayerNumber = function(player_number) {
     this.current_player_number = player_number
-
     this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
 }
 
@@ -139,15 +136,3 @@ Game.prototype.isValidPlacement = function(grid_pos) {
     return test;
 }
 
-Game.prototype.isValidFlip = function(grid_pos, flip_history) {
-    const probed_cell_value = this.grid[grid_pos.row * this.grid_dim + grid_pos.col]
-    if (probed_cell_value == this.current_player_number) { return false }
-
-    return true
-}
-
-Game.prototype.resetMovesState = function() {
-    this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
-    this.current_player_flip_direction = {row_dir: 0, col_dir: 0}
-    this.current_player_flip_history = []
-}
