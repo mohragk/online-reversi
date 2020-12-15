@@ -22,6 +22,10 @@
                 display: inline-block;
                 font-size: 36px;
             }
+
+            .disable-dbl-tap-zoom {
+                touch-action: manipulation;
+            }
         </style>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
@@ -38,7 +42,7 @@
       <div id= "main">
         <div id="player_data">Waiting for other player</div>
         <div id="player_score"></div>
-        <canvas id="grid_canvas" width="600" height="600"></canvas>
+        <canvas id="grid_canvas" class="disable-dbl-tap-zoom" width="600" height="600"></canvas>
         <button id="end_turn_button">End turn</button>
       </div>
     
