@@ -1,10 +1,8 @@
 const CELL_TYPES = require('./public/cell_types')
 
 const PLAYER_MOVES_STATE = {
-    IDLE: -1,
     ADD_COIN: 0,
     FLIP_COIN: 1,
-    BLOCKED: 2
 }
 
 
@@ -17,6 +15,7 @@ var Game = function(id) {
     this.current_player_number = CELL_TYPES.CONTAINS_RED 
     this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
     this.current_player_flip_direction = {row_dir: 0, col_dir: 0}
+    this.current_player_flip_history = [] 
 
     this.reset()
 }
@@ -87,8 +86,12 @@ Game.prototype.addOrFlipCoin = function(row, col, player_number) {
     // FLIP COIN
     if (current_cell_value !== CELL_TYPES.EMPTY) {
         if (this.current_player_moves_state === PLAYER_MOVES_STATE.FLIP_COIN) {
-            const new_cell_value = current_cell_value == CELL_TYPES.CONTAINS_GREEN ? CELL_TYPES.CONTAINS_RED :  CELL_TYPES.CONTAINS_GREEN
-            this.grid[ row * this.grid_dim + col ] = new_cell_value
+            const is_valid_flip = true // this.isValidFlip({row, col})
+            if (is_valid_flip) {
+                const new_cell_value = current_cell_value == CELL_TYPES.CONTAINS_GREEN ? CELL_TYPES.CONTAINS_RED :  CELL_TYPES.CONTAINS_GREEN
+                this.grid[ row * this.grid_dim + col ] = new_cell_value
+                
+            }
         }
     }
     //ADD COIN
@@ -136,7 +139,15 @@ Game.prototype.isValidPlacement = function(grid_pos) {
     return test;
 }
 
+Game.prototype.isValidFlip = function(grid_pos, flip_history) {
+    const probed_cell_value = this.grid[grid_pos.row * this.grid_dim + grid_pos.col]
+    if (probed_cell_value == this.current_player_number) { return false }
+
+    return true
+}
+
 Game.prototype.resetMovesState = function() {
-    this.current_player_moves_state = PLAYER_MOVES_STATE.IDLE
+    this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
     this.current_player_flip_direction = {row_dir: 0, col_dir: 0}
+    this.current_player_flip_history = []
 }
