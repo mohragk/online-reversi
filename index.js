@@ -76,8 +76,6 @@ io.sockets.on('connection', (socket) => {
     })
 
     socket.on('remove_coin', (pos) => {
-        //const game_id = users[socket.id].game_id
-
         const game = getGameFromSocketId(users, socket.id)
         if (game) {
             game.removeCoin(pos)
