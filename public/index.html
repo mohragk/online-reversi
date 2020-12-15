@@ -82,14 +82,16 @@
             context.fill();
         } 
 
-        
+        let is_double_tapping = false
 
         jQuery(document).ready(async function($) {
             function isDoubleTap() {
                 let is_double_tap = false
+
                 const now = new Date().getTime()
                 let time_since = now - latest_tap_time
                 const double_tap_time = 260
+
                 if (time_since >= 0 && time_since < double_tap_time) {
                     is_double_tap = true
                 }
@@ -116,13 +118,13 @@
                 const col = Math.floor(mouse_position.x / cell_size_pixels)
                 const row = Math.floor(mouse_position.y / cell_size_pixels)
 
-                if (e.button === 0) {
-                    socket.emit('add_or_flip_coin', {row, col, player_number})
-                }
-                
                 if ( isDoubleTap() ) {
                     socket.emit('remove_coin', {pos: {row, col}, player_number })
                 }
+                else {
+                    socket.emit('add_or_flip_coin', {row, col, player_number})
+                }
+
             }, false);
 
 
@@ -132,7 +134,7 @@
                 // Convert mouse coords to grid coords
                 const col = Math.floor(mouse_position.x / cell_size_pixels)
                 const row = Math.floor(mouse_position.y / cell_size_pixels)
-                socket.emit('remove_coin', {row, col})
+                socket.emit('remove_coin', {pos: {row, col}, player_number })
             })
 
             window.addEventListener('keypress', function(e) {
