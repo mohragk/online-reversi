@@ -42,6 +42,7 @@
         <div id="player_data">Waiting for other player</div>
         <div id="player_score"></div>
         <canvas id="grid_canvas" width="600" height="600"></canvas>
+        <button id="end_turn_button">End turn</button>
       </div>
     
 
@@ -207,6 +208,12 @@
                 200
             )
             
+
+            $('#end_turn_button').click(function(e) {
+                e.preventDefault()
+                socket.emit('switch_to_other_player', player_number)
+
+            })
 
            
         })
