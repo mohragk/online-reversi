@@ -167,6 +167,7 @@
                 ctx.fillText("No other player available", canvas_w/2 , canvas_h/2);
 
                 player_score = 0;
+                $('#end_turn_button').toggle(false)
             })
 
             socket.on('player_number', number => {
@@ -246,11 +247,6 @@
                         ctx.strokeStyle = player_number === 1 ? 'red' : 'green'
                         ctx.lineWidth = 8 * 4;
                         ctx.strokeRect(0,0, canvas_w, canvas_h )
-
-                        //const extra_message = $('<h4>').text('Press E to end turn').attr('id', 'extra_message')
-                        //$('#main').append(extra_message)
-
-                        //$('#end_turn_button').toggle(true)
                     }
                 }
             })
