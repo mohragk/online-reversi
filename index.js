@@ -50,14 +50,13 @@ io.sockets.on('connection', (socket) => {
         console.log(users)
     } )
 
-    socket.on('leave', () => {
-        console.log(`Elvis has left the building`)
-    })
 
     socket.on('request_update', () => {
         const game_id = users[socket.id].game_id
         const game = runningGames[game_id]
-        socket.emit('game_update', game)
+        if (game) {
+            socket.emit('game_update', game)
+        }
     } )
 
     socket.on('flip_coin', (msg) => {
@@ -77,9 +76,11 @@ io.sockets.on('connection', (socket) => {
     })
 
     socket.on('remove_coin', (pos) => {
-        const game_id = users[socket.id].game_id
-        if (game_id) {
-            runningGames[game_id].removeCoin(pos)
+        //const game_id = users[socket.id].game_id
+
+        const game = getGameFromSocketId(users, socket.id)
+        if (game) {
+            game.removeCoin(pos)
         }
     })
 
@@ -97,6 +98,11 @@ io.sockets.on('connection', (socket) => {
     createGameSessionForWaiting()
     console.log(users)
 })
+
+function getGameFromSocketId(users, socket_id) {
+    const game_id = users[socket_id].game_id
+    return runningGames[game_id]
+}
 
 function createGameSessionForWaiting() {
     const room_clients = getClientsForRoom(ROOM_TYPES.waiting)

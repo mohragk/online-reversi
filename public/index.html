@@ -2,20 +2,32 @@
     <head>
         <title>Reversi</title>
         <style>
+
+            #main {
+                width: 600px;
+                margin: 0 auto;
+                margin-top: 48px;
+            }
+
+            #grid_canvas {
+                margin: 24px 0;
+            }
+
             .red_circle, .green_circle {
                 background-color: red;
-            display:block;
-            height:42px;
-            width:42px;
-            border-radius:50%;
-           
-            margin:auto;
+                display:block;
+                height:42px;
+                width:42px;
+                border-radius:50%;
             
+                margin:auto;
             }
             .green_circle {
                 background-color: green;
             }
         </style>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
     </head>
     <body>
         <script src="/socket.io/socket.io.js"></script>
@@ -29,7 +41,7 @@
       <div id= "main">
         <div id="player_data">Waiting for other player</div>
         <div id="player_score"></div>
-        <canvas id="grid_canvas" width="720" height="720"></canvas>
+        <canvas id="grid_canvas" width="600" height="600"></canvas>
       </div>
     
 
@@ -79,6 +91,9 @@
             }, false);
 
             canvas.addEventListener('contextmenu', function(e) {
+
+                e.preventDefault()
+
                 // Convert mouse coords to grid coords
                 const col = Math.floor(mouse_position.x / cell_size_pixels)
                 const row = Math.floor(mouse_position.y / cell_size_pixels)
@@ -109,14 +124,20 @@
                 player_number = number;
                 const player_data = $('#player_data');
                 
-                let html = `<h4>You're the RED player - press E to end turn</h4>` 
+                
+                let player_color
                 if (player_number == 1) {
-                    html = `<h4>You're the RED player - press E to end turn</h4>`
+                    player_color = `RED`
                 }
                 else {
-                    html = `<h4>You're the GREEN player - press E to end turn</h4>`
+                   player_color = `GREEN`
                 }
-                player_data.html(html)
+                let message = `You're the ${player_color} player`
+
+
+                player_data.empty().append (
+                    $('<h4>').text(message)
+                )
             })
 
             socket.on('game_update', (game_state) => {
@@ -143,7 +164,7 @@
                             
                             const cell_value = grid[row * grid_dim + col]
                             if (cell_value === player_number) player_score++
-                            ctx.fillStyle = 'black'
+                            ctx.fillStyle = 'rgb(37, 37, 37)'
                             ctx.fillRect(x, y, cell_size_pixels - half_margin, cell_size_pixels - half_margin)
                             
 
@@ -162,15 +183,19 @@
                         }
                     }
                     
-                    const is_your_turn = (game_state.current_player_number === player_number)
+                    your_turn = (game_state.current_player_number === player_number)
                     
 
+                    $('#extra_message').remove()
                     
-                    if (is_your_turn) {
+                    if (your_turn) {
                         // draw border
                         ctx.strokeStyle = player_number === 1 ? 'red' : 'green'
                         ctx.lineWidth = 8 * 4;
                         ctx.strokeRect(0,0, canvas_w, canvas_h )
+
+                        //const extra_message = $('<h4>').text('Press E to end turn').attr('id', 'extra_message')
+                        //$('#main').append(extra_message)
                     }
                 }
             })
