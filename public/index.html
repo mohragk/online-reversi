@@ -32,20 +32,23 @@
     </head>
     <body>
         <script src="/socket.io/socket.io.js"></script>
-    </body>
         <script
             src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
             integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
             crossorigin="anonymous">
         </script>
+
+        <div id="main">
+            <div id="player_data">Waiting for other player</div>
+            <div id="player_score"></div>
+            <canvas id="grid_canvas" class="disable-dbl-tap-zoom" width="600" height="600"></canvas>
+            <button id="end_turn_button">End turn</button>
+        </div>
+
+    </body>
       
-      <div id= "main">
-        <div id="player_data">Waiting for other player</div>
-        <div id="player_score"></div>
-        <canvas id="grid_canvas" class="disable-dbl-tap-zoom" width="600" height="600"></canvas>
-        <button id="end_turn_button">End turn</button>
-      </div>
     
+
 
     <script>
         let socket
@@ -54,8 +57,6 @@
         let cell_size_pixels = 48
         let mouse_position
         let player_score
-
-       
 
         function drawCircle(context, x, y, radius) {
             context.beginPath();
@@ -86,17 +87,17 @@
 
             socket = await io.connect('')
 
-            let latest_tap_time = new Date().getTime()
-
+            
             var canvas = document.getElementById('grid_canvas');
             var ctx = canvas.getContext('2d');
-           
-
-
+            
+            
             canvas.addEventListener('mousemove', function(e) {
                 mouse_position = getMousePos(canvas, e);
             }, false);
-
+            
+           
+            let latest_tap_time = new Date().getTime()
             canvas.addEventListener("click", function(e) {
                 // Convert mouse coords to grid coords
                 const col = Math.floor(mouse_position.x / cell_size_pixels)
@@ -111,8 +112,6 @@
                 }
             }, false);
 
-
-            
 
             canvas.addEventListener('contextmenu', function(e) {
                 e.preventDefault()
@@ -137,9 +136,29 @@
                     y: e.clientY - rect.top
                 };
             }
+
+
+            // SOCKET STUFF
             
             socket.on('waiting', (msg)=> {
-                console.log(msg)
+               
+            })
+
+            socket.on('game_ended', function(msg) {
+                var canvas_w = canvas.width;
+                var canvas_h = canvas.height;
+                ctx.clearRect(0,0, canvas_w, canvas_h)
+
+                // draw border
+                ctx.strokeStyle = 'black'
+                ctx.lineWidth = 4;
+                ctx.strokeRect(0,0, canvas_w, canvas_h )
+
+                ctx.font = "32px Arial"
+                ctx.textAlign = "center"
+                ctx.fillStyle = 'black'
+                ctx.fillText("No other player available", canvas_w/2 , canvas_h/2);
+
             })
 
             socket.on('player_number', number => {
@@ -222,12 +241,9 @@
                 }
             })
 
-            setInterval(
-                () =>{
-                    socket.emit('request_update')
-                },
-                200
-            )
+            setInterval( () => { 
+                socket.emit('request_update')
+            }, 200 )
             
 
             $('#end_turn_button').click(function(e) {

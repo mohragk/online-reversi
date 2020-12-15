@@ -57,6 +57,9 @@ io.sockets.on('connection', (socket) => {
         if (game) {
             socket.emit('game_update', game)
         }
+        else {
+            socket.emit('game_ended', 'The game ended')
+        }
     } )
 
     socket.on('flip_coin', (msg) => {
