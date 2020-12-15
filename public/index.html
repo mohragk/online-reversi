@@ -87,6 +87,9 @@
             var canvas = document.getElementById('grid_canvas');
             var ctx = canvas.getContext('2d');
            
+            $('body').bind('touchmove', function(event) { event.preventDefault() }); // turns off
+
+
             canvas.addEventListener('mousemove', function(e) {
                 mouse_position = getMousePos(canvas, e);
             }, false);
@@ -106,23 +109,7 @@
             }, false);
 
 
-            let tapped_twice = false
-            canvas.addEventListener("touchstart", function(e) {
-                e.preventDefault()
-
-                const tap_time = 300
-                
-                if (!tapped_twice) {
-                    tapped_twice = true
-                    setTimeOut(function() { tapped_twice = false }, tap_time)
-                    return false
-                }
-                
-                
-                const col = Math.floor(mouse_position.x / cell_size_pixels)
-                const row = Math.floor(mouse_position.y / cell_size_pixels)
-                socket.emit('remove_coin', {row, col})
-            })
+            
 
             canvas.addEventListener('contextmenu', function(e) {
                 e.preventDefault()
