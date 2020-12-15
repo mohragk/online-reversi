@@ -108,6 +108,7 @@
 
             let tapped_twice = false
             canvas.addEventListener("touchstart", function(e) {
+                e.preventDefault()
 
                 const tap_time = 300
                 
@@ -117,7 +118,6 @@
                     return false
                 }
                 
-                e.preventDefault()
                 
                 const col = Math.floor(mouse_position.x / cell_size_pixels)
                 const row = Math.floor(mouse_position.y / cell_size_pixels)
