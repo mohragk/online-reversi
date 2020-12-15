@@ -21,6 +21,13 @@
                 text-align: center;
                 display: inline-block;
                 font-size: 36px;
+                width: 100%;
+            }
+
+            #end_turn_button:disabled,
+            #end_turn_button[disabled]{
+                background-color: #cccccc;
+                color: #666666;
             }
 
             .disable-dbl-tap-zoom {
@@ -58,6 +65,11 @@
         let mouse_position
         let player_score
         const game_state_poll_rate_hz = 5
+
+        const BUTTON_STATES_TEXT = {
+            WAIT: 'Wait turn',
+            ACTIVE: 'End turn'
+        }
 
         function drawCircle(context, x, y, radius) {
             context.beginPath();
@@ -141,9 +153,9 @@
             $('#end_turn_button').click(function(e) {
                 e.preventDefault()
                 socket.emit('switch_to_other_player', player_number)
-
             })
-
+            .prop('disabled', true) // hide at start
+            .text(BUTTON_STATES_TEXT.WAIT)
 
             // SOCKET STUFF
             
@@ -167,7 +179,9 @@
                 ctx.fillText("No other player available", canvas_w/2 , canvas_h/2);
 
                 player_score = 0;
-                $('#end_turn_button').toggle(false)
+                $('#end_turn_button')
+                .prop('disabled', true)
+                .text(BUTTON_STATES_TEXT.WAIT)
             })
 
             socket.on('player_number', number => {
@@ -240,13 +254,22 @@
                     
                     your_turn = (game_state.current_player_number === player_number)
                     
-                    $('#end_turn_button').toggle(your_turn)
+                    $('#end_turn_button')
+                    .prop('disabled', !your_turn)
+
+                    
+                    $('#end_turn_button')
+                    .text(BUTTON_STATES_TEXT.WAIT)
 
                     if (your_turn) {
                         // draw border
                         ctx.strokeStyle = player_number === 1 ? 'red' : 'green'
                         ctx.lineWidth = 8 * 4;
                         ctx.strokeRect(0,0, canvas_w, canvas_h )
+
+                        $('#end_turn_button')
+                        .text(BUTTON_STATES_TEXT.ACTIVE)
+
                     }
                 }
             })
