@@ -58,18 +58,14 @@ Game.prototype.setPlayerNumber = function(player_number) {
     this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
 }
 
-Game.prototype.flipCoin = function(row, col) {
-    let current_coin_side = this.grid[ row * this.grid_dim + col ]
-    if (current_coin_side !== CELL_TYPES.EMPTY) {
-        const new_coin_side = current_coin_side == CELL_TYPES.CONTAINS_GREEN ? CELL_TYPES.CONTAINS_RED :  CELL_TYPES.CONTAINS_GREEN
-        this.grid[ row * this.grid_dim + col ] = new_coin_side
-    }
-}
 
 Game.prototype.removeCoin = function(grid_pos) {
     let current_coin_side = this.grid[ grid_pos.row * this.grid_dim + grid_pos.col ]
     if (current_coin_side !== CELL_TYPES.EMPTY) {
+
         this.grid[ grid_pos.row * this.grid_dim + grid_pos.col ] = CELL_TYPES.EMPTY
+        
+        // Reset state to be able add coin
         this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
     }
 }
