@@ -193,7 +193,8 @@ jQuery(document).ready(async function($) {
 
             if (player_turn) {
                 // draw border
-                ctx.strokeStyle = player_number === 1 ? 'red' : 'green'
+                ctx.strokeStyle = player_number === 1 ? `rgba(255, 0 , 0, 0.8)` : `rgba(0, 180, 0, 0.8)`
+                
                 ctx.lineWidth = 8 * 4;
                 ctx.strokeRect(0,0, canvas_w, canvas_h )
             }
