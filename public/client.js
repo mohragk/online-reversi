@@ -125,58 +125,21 @@ jQuery(document).ready(async function($) {
         
         player_score = 0;
 
-        $('#end_turn_button')
-            .prop('disabled', true)
-            .text(BUTTON_STATES_TEXT.WAIT)
-        
-        $('#player_data').text('Waiting for other player')
-        $('#player_score').text('')
+        updateHTMLTurnButton(false)
+        updateHTMLPlayerHeader('Waiting for other player')
+        updateHTMLPlayerScore(-1) // -1 = No score display
     })
 
     socket.on('player_number', number => {
         player_number = number;
-        updateHTMLPlayerMessage()
+        updateHTMLPlayerHeader()
     })
 
-    // Poll game update at interval
-    setInterval( () => { 
-        socket.emit('request_update')
-    }, 1000/GAMESTATE_POLL_RATE_HZ )
-    
-    function updateHTMLTurnButton(is_active) {
-        $('#end_turn_button')
-        .prop('disabled', !is_active)
-        .text(is_active ? BUTTON_STATES_TEXT.ACTIVE : BUTTON_STATES_TEXT.WAIT)
-    }
-    function updateHTMLPlayerScore(score) {
-        $('#player_score').text(`Score: ${score}` )
-    }
-
-    function updateHTMLPlayerMessage() {
-        const player_data = $('#player_data');
-        
-        let player_color
-        if (player_number == 1) {
-            player_color = `RED`
-        }
-        else {
-            player_color = `GREEN`
-        }
-        let message = `You're the ${player_color} player`
-
-
-        player_data.empty().append (
-            $('<h4>').text(message)
-        )
-    }
+ 
 
     socket.on('game_update', (game_state) => {
-
-        
-
         if (game_state !== null) {
            
-
             player_turn = (game_state.current_player_number === player_number)
             updateHTMLTurnButton(player_turn)
            
@@ -230,9 +193,49 @@ jQuery(document).ready(async function($) {
 
 
            updateHTMLPlayerScore(player_score)
-           updateHTMLPlayerMessage()
+           updateHTMLPlayerHeader()
         }
     })
 
+
+    // Poll game update at interval
+    setInterval( () => { 
+        socket.emit('request_update')
+    }, 1000/GAMESTATE_POLL_RATE_HZ )
+    
+    function updateHTMLTurnButton(is_active) {
+        $('#end_turn_button')
+        .prop('disabled', !is_active)
+        .text(is_active ? BUTTON_STATES_TEXT.ACTIVE : BUTTON_STATES_TEXT.WAIT)
+    }
+
+    function updateHTMLPlayerScore(score) {
+        if (score < 0) {
+            $('#player_score').text(``)
+        }
+        else {
+            $('#player_score').text(`Score: ${score}`)
+        }
+
+    }
+
+    function updateHTMLPlayerHeader(set_message = '') {
+        const player_data = $('#player_data');
+        
+        let player_color
+        if (player_number == 1) {
+            player_color = `RED`
+        }
+        else {
+            player_color = `GREEN`
+        }
+        let message = `You're the ${player_color} player`
+
+        if (set_message !== '') message = set_message
+
+        player_data.empty().append (
+            $('<h4>').text(message)
+        )
+    }
     
 }) //jQuery
