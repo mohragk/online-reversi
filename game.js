@@ -74,8 +74,10 @@ Game.prototype.removeCoin = function(grid_pos, player_number) {
     // Not allowed to change board when not player's turn
     if (player_number !== this.current_player_number) return
     if (this.current_player_moves_state == PLAYER_MOVES_STATE.IDLE) return
+    if (this.last_placed_coin_pos == null) return
 
     const {row, col} = grid_pos
+
 
     if (this.last_placed_coin_pos.row == row && this.last_placed_coin_pos.col == col) {
         this.grid[ row * this.grid_dim + col ] = CELL_TYPES.EMPTY
@@ -90,6 +92,11 @@ Game.prototype.removeCoin = function(grid_pos, player_number) {
    
 }
 
+const isSamePos = (pos_a, pos_b) => {
+    return pos_a.row === pos_b.row && pos_a.col === pos_b.col
+}
+
+
 Game.prototype.addOrFlipCoin = function(grid_pos, player_number, immediate_mode = false) {
     // Not allowed to change board when not player's turn
     if (player_number !== this.current_player_number) return
@@ -102,8 +109,13 @@ Game.prototype.addOrFlipCoin = function(grid_pos, player_number, immediate_mode 
 
     // FLIP COIN
     if (current_cell_value !== CELL_TYPES.EMPTY) {
+        
         // First flip, determines working direction
         if (this.current_player_moves_state === PLAYER_MOVES_STATE.FLIP_COIN) {
+
+
+            if (isSamePos(this.last_placed_coin_pos, grid_pos)) return
+
             const new_cell_value = current_cell_value == CELL_TYPES.CONTAINS_GREEN ? CELL_TYPES.CONTAINS_RED :  CELL_TYPES.CONTAINS_GREEN
             this.grid[ row * this.grid_dim + col ] = new_cell_value
 
@@ -220,22 +232,26 @@ Game.prototype.createFlippableList = function(first_flip_pos) {
         while(true) {
             cell_pos.row += new_dir.row_dir 
             cell_pos.col += new_dir.col_dir 
-
             const cell_value = this.grid[ cell_pos.row * this.grid_dim + cell_pos.col ]
-           
+            
             if (cell_value !== this.current_player_number) {
                 this.flippable_coins.push({...cell_pos})
+                
+                if (i>this.grid_dim) break;
             }
             else {
                 this.last_placed_coin_pos = null
                 break
             }
+            
+            i++
         }
     }
 }
 
 Game.prototype.flipFlippableCoinsInRow = function(first_flip_pos) {
     if (this.last_placed_coin_pos !== null) {   
+
         const new_dir = direction(this.last_placed_coin_pos, first_flip_pos)
     
         // Iteratively check if next coins are flippable
