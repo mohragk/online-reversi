@@ -76,6 +76,7 @@ io.sockets.on('connection', (socket) => {
         const game = getGameFromSocketId(users, socket.id)
         if (game) {
             game.removeCoin(player_data.pos, player_data.player_number)
+            socket.emit('game_update',  runningGames[game_id])
         }
     })
 
@@ -84,6 +85,7 @@ io.sockets.on('connection', (socket) => {
         const game_id = users[socket.id].game_id
         if (game_id) {
             runningGames[game_id].setPlayerNumber(other_player_number)
+            socket.emit('game_update',  runningGames[game_id])
         }
     })
 

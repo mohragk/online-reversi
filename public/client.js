@@ -4,7 +4,7 @@ let your_turn = false
 let cell_size_pixels = 48
 let mouse_position
 let player_score
-const game_state_poll_rate_hz = 5
+const game_state_poll_rate_hz = 1
 
 const BUTTON_STATES_TEXT = {
     WAIT: 'Wait turn',
@@ -157,15 +157,22 @@ jQuery(document).ready(async function($) {
 
     socket.on('game_update', (game_state) => {
 
-        const player_score_div = $('#player_score').text(`Score: ${player_score}` )
+        $('#player_score').text(`Score: ${player_score}` )
 
         if (game_state !== null) {
+            // reset
+            player_score = 0
+
+            your_turn = (game_state.current_player_number === player_number)
+            
+            $('#end_turn_button')
+            .prop('disabled', !your_turn)
+            .text(your_turn ? BUTTON_STATES_TEXT.ACTIVE : BUTTON_STATES_TEXT.WAIT)
+
             var canvas_w = canvas.width;
             var canvas_h = canvas.height;
             ctx.clearRect(0,0, canvas_w, canvas_h)
 
-            // reset
-            player_score = 0
             
             // update and draw grid
             const { grid, grid_dim } = game_state
@@ -198,24 +205,13 @@ jQuery(document).ready(async function($) {
                 }
             }
             
-            your_turn = (game_state.current_player_number === player_number)
-            
-            $('#end_turn_button')
-            .prop('disabled', !your_turn)
-
-            
-            $('#end_turn_button')
-            .text(BUTTON_STATES_TEXT.WAIT)
+           
 
             if (your_turn) {
                 // draw border
                 ctx.strokeStyle = player_number === 1 ? 'red' : 'green'
                 ctx.lineWidth = 8 * 4;
                 ctx.strokeRect(0,0, canvas_w, canvas_h )
-
-                $('#end_turn_button')
-                .text(BUTTON_STATES_TEXT.ACTIVE)
-
             }
         }
     })
