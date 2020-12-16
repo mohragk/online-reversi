@@ -41,14 +41,10 @@ Game.prototype.reset = function() {
     {
         let row = 3
         let col = 4
-        this.grid[row * this.grid_dim + col] = CELL_TYPES.CONTAINS_RED
+        this.grid[row * this.grid_dim + col] = CELL_TYPES.CONTAINS_GREEN
     }
 
-    {
-        let row = 2
-        let col = 4
-        this.grid[row * this.grid_dim + col] = CELL_TYPES.CONTAINS_RED
-    }
+   
 
     {
         let row = 4
@@ -59,7 +55,7 @@ Game.prototype.reset = function() {
     {
         let row = 4
         let col = 4
-        this.grid[row * this.grid_dim + col] = CELL_TYPES.CONTAINS_GREEN
+        this.grid[row * this.grid_dim + col] = CELL_TYPES.CONTAINS_RED
     }
 }
 
@@ -69,12 +65,17 @@ Game.prototype.setPlayerNumber = function(player_number) {
     this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
 }
 
+Game.prototype.shallPass = function(player_number) {
+     // Not allowed to change board when not player's turn
+     if (player_number !== this.current_player_number) return false
+     if (this.current_player_moves_state == PLAYER_MOVES_STATE.IDLE) return false
+    
+     return true
+}
 
 Game.prototype.removeCoin = function(grid_pos, player_number) {
-    // Not allowed to change board when not player's turn
-    if (player_number !== this.current_player_number) return
-    if (this.current_player_moves_state == PLAYER_MOVES_STATE.IDLE) return
-    if (this.last_placed_coin_pos == null) return
+    if (!this.shallPass(player_number)) return
+    if (this.last_placed_coin_pos == null) return 
 
     const {row, col} = grid_pos
 
@@ -98,9 +99,7 @@ const isSamePos = (pos_a, pos_b) => {
 
 
 Game.prototype.addOrFlipCoin = function(grid_pos, player_number, immediate_mode = false) {
-    // Not allowed to change board when not player's turn
-    if (player_number !== this.current_player_number) return
-    if (this.current_player_moves_state == PLAYER_MOVES_STATE.IDLE) return
+    if (!this.shallPass(player_number)) return
 
     
     const {row, col} = grid_pos
