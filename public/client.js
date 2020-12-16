@@ -64,7 +64,7 @@ jQuery(document).ready(async function($) {
         const player_data = {pos:current_click_cell_pos, player_number, flip_immediately}
        
         if ( is_double_tapping && is_same_cell ) {
-           // socket.emit('remove_coin', player_data)
+            socket.emit('remove_coin', player_data)
         }
         else {
             socket.emit('add_or_flip_coin', player_data)
