@@ -73,14 +73,22 @@ Game.prototype.shallPass = function(player_number) {
      return true
 }
 
+
+const isSamePos = (pos_a, pos_b) => {
+    return pos_a.row === pos_b.row && pos_a.col === pos_b.col
+}
+
 Game.prototype.removeCoin = function(grid_pos, player_number) {
-    if (!this.shallPass(player_number)) return
-    if (this.last_placed_coin_pos == null) return 
+    if (!this.shallPass(player_number)) 
+        return
+        
+    if (this.last_placed_coin_pos == null) 
+        return 
 
-    const {row, col} = grid_pos
-
-
-    if (this.last_placed_coin_pos.row == row && this.last_placed_coin_pos.col == col) {
+    
+    if (this.isSamePos(this.last_placed_coin_pos, grid_pos)) {
+        const {row, col} = grid_pos
+        
         this.grid[ row * this.grid_dim + col ] = CELL_TYPES.EMPTY
 
         this.last_placed_coin_pos = null
@@ -93,13 +101,11 @@ Game.prototype.removeCoin = function(grid_pos, player_number) {
    
 }
 
-const isSamePos = (pos_a, pos_b) => {
-    return pos_a.row === pos_b.row && pos_a.col === pos_b.col
-}
 
 
 Game.prototype.addOrFlipCoin = function(grid_pos, player_number, immediate_mode = false) {
-    if (!this.shallPass(player_number)) return
+    if (!this.shallPass(player_number)) 
+        return
 
     
     const {row, col} = grid_pos
@@ -112,9 +118,12 @@ Game.prototype.addOrFlipCoin = function(grid_pos, player_number, immediate_mode 
         // First flip, determines working direction
         if (this.current_player_moves_state === PLAYER_MOVES_STATE.FLIP_COIN) {
 
-            if (!this.isValidFirstFlip(grid_pos)) return
+            
+            if ( ! this.isValidFirstFlip(grid_pos) ) 
+                return
 
-            if (isSamePos(this.last_placed_coin_pos, grid_pos)) return
+            if ( isSamePos(this.last_placed_coin_pos, grid_pos) ) 
+                return
 
             const new_cell_value = current_cell_value == CELL_TYPES.CONTAINS_GREEN ? CELL_TYPES.CONTAINS_RED :  CELL_TYPES.CONTAINS_GREEN
             this.grid[ row * this.grid_dim + col ] = new_cell_value
