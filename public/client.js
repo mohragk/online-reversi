@@ -1,10 +1,12 @@
+const GAMESTATE_POLL_RATE_HZ = 3
 let socket
+
 let player_number
-let your_turn = false
+let player_score
+let player_turn = false
+
 let cell_size_pixels = 48
 let mouse_position
-let player_score
-const game_state_poll_rate_hz = 1
 
 const BUTTON_STATES_TEXT = {
     WAIT: 'Wait turn',
@@ -22,7 +24,7 @@ function drawCircle(context, x, y, radius) {
     context.fill();
 }
 
-const is_same_pos = (last_mouse_pos, curr_mouse_pos) => last_mouse_pos.row === curr_mouse_pos.row && last_mouse_pos.col == curr_mouse_pos.col
+const isSamePos = (last_cell_pos, curr_cell_pos) => last_cell_pos.row === curr_cell_pos.row && last_cell_pos.col == curr_cell_pos.col
 
 
 
@@ -36,6 +38,13 @@ jQuery(document).ready(async function($) {
     
     
     canvas.addEventListener('mousemove', function(e) {
+        const getMousePos = (canvas,e) => {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
         mouse_position = getMousePos(canvas, e);
     }, false);
     
@@ -49,7 +58,7 @@ jQuery(document).ready(async function($) {
         const row = Math.floor(mouse_position.y / cell_size_pixels)
 
         const current_click_cell_pos = {row, col}
-        const is_same_cell = is_same_pos(latest_click_cell_pos, current_click_cell_pos)
+        const is_same_cell = isSamePos(latest_click_cell_pos, current_click_cell_pos)
         const player_data = {pos:current_click_cell_pos, player_number}
        
         if ( is_double_tapping && is_same_cell ) {
@@ -84,13 +93,7 @@ jQuery(document).ready(async function($) {
         }
     })
 
-    function getMousePos(canvas, e) {
-        var rect = canvas.getBoundingClientRect();
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        };
-    }
+ 
 
     $('#end_turn_button').click(function(e) {
         e.preventDefault()
@@ -132,8 +135,25 @@ jQuery(document).ready(async function($) {
 
     socket.on('player_number', number => {
         player_number = number;
+        updateHTMLPlayerMessage()
+    })
+
+    // Poll game update at interval
+    setInterval( () => { 
+        socket.emit('request_update')
+    }, 1000/GAMESTATE_POLL_RATE_HZ )
+    
+    function updateHTMLTurnButton(is_active) {
+        $('#end_turn_button')
+        .prop('disabled', !is_active)
+        .text(is_active ? BUTTON_STATES_TEXT.ACTIVE : BUTTON_STATES_TEXT.WAIT)
+    }
+    function updateHTMLPlayerScore(score) {
+        $('#player_score').text(`Score: ${score}` )
+    }
+
+    function updateHTMLPlayerMessage() {
         const player_data = $('#player_data');
-        
         
         let player_color
         if (player_number == 1) {
@@ -148,31 +168,25 @@ jQuery(document).ready(async function($) {
         player_data.empty().append (
             $('<h4>').text(message)
         )
-    })
-
-    setInterval( () => { 
-        socket.emit('request_update')
-    }, 1000/game_state_poll_rate_hz )
-    
+    }
 
     socket.on('game_update', (game_state) => {
 
-        $('#player_score').text(`Score: ${player_score}` )
+        
 
         if (game_state !== null) {
-            // reset
-            player_score = 0
+           
 
-            your_turn = (game_state.current_player_number === player_number)
-            
-            $('#end_turn_button')
-            .prop('disabled', !your_turn)
-            .text(your_turn ? BUTTON_STATES_TEXT.ACTIVE : BUTTON_STATES_TEXT.WAIT)
+            player_turn = (game_state.current_player_number === player_number)
+            updateHTMLTurnButton(player_turn)
+           
 
             var canvas_w = canvas.width;
             var canvas_h = canvas.height;
             ctx.clearRect(0,0, canvas_w, canvas_h)
 
+            // reset, is recalculated based on board
+            player_score = 0
             
             // update and draw grid
             const { grid, grid_dim } = game_state
@@ -207,12 +221,16 @@ jQuery(document).ready(async function($) {
             
            
 
-            if (your_turn) {
+            if (player_turn) {
                 // draw border
                 ctx.strokeStyle = player_number === 1 ? 'red' : 'green'
                 ctx.lineWidth = 8 * 4;
                 ctx.strokeRect(0,0, canvas_w, canvas_h )
             }
+
+
+           updateHTMLPlayerScore(player_score)
+           updateHTMLPlayerMessage()
         }
     })
 
