@@ -90,7 +90,7 @@ Game.prototype.removeCoin = function(grid_pos, player_number) {
    
 }
 
-Game.prototype.addOrFlipCoin = function(grid_pos, player_number) {
+Game.prototype.addOrFlipCoin = function(grid_pos, player_number, immediate_mode = false) {
     // Not allowed to change board when not player's turn
     if (player_number !== this.current_player_number) return
     if (this.current_player_moves_state == PLAYER_MOVES_STATE.IDLE) return
@@ -107,9 +107,13 @@ Game.prototype.addOrFlipCoin = function(grid_pos, player_number) {
             const new_cell_value = current_cell_value == CELL_TYPES.CONTAINS_GREEN ? CELL_TYPES.CONTAINS_RED :  CELL_TYPES.CONTAINS_GREEN
             this.grid[ row * this.grid_dim + col ] = new_cell_value
 
-            //this.createFlippableList(grid_pos)
-            this.flipFlippableCoinsInRow(grid_pos)
-
+            if (immediate_mode) {
+                this.flipFlippableCoinsInRow(grid_pos)
+            }
+            else {
+                this.createFlippableList(grid_pos)
+            }
+                
 
             if (this.flippable_coins.length > 0) {
                 this.current_player_moves_state = PLAYER_MOVES_STATE.FLIP_REST_COIN
