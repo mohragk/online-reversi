@@ -69,7 +69,9 @@ io.sockets.on('connection', (socket) => {
         if (game_id) {
             runningGames[game_id].addOrFlipCoin(player_data.pos, player_data.player_number)
             socket.emit('game_update',  runningGames[game_id])
+
         }
+
     })
 
     socket.on('remove_coin', (player_data) => {
