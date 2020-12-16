@@ -62,21 +62,25 @@ Game.prototype.setPlayerNumber = function(player_number) {
 Game.prototype.removeCoin = function(grid_pos, player_number) {
     // Not allowed to change board when not player's turn
     if (player_number !== this.current_player_number) return
+
+    const {row, col} = grid_pos
  
-    let current_coin_side = this.grid[ grid_pos.row * this.grid_dim + grid_pos.col ]
+    let current_coin_side = this.grid[ row * this.grid_dim + col ]
     if (current_coin_side !== CELL_TYPES.EMPTY) {
 
-        this.grid[ grid_pos.row * this.grid_dim + grid_pos.col ] = CELL_TYPES.EMPTY
+        this.grid[ row * this.grid_dim + col ] = CELL_TYPES.EMPTY
         
         // Reset state to be able add coin
         this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
     }
 }
 
-Game.prototype.addOrFlipCoin = function(row, col, player_number) {
+Game.prototype.addOrFlipCoin = function(grid_pos, player_number) {
     // Not allowed to change board when not player's turn
     if (player_number !== this.current_player_number) return
-
+    
+    const {row, col} = grid_pos
+    
     let current_cell_value = this.grid[ row * this.grid_dim + col ]
 
     // FLIP COIN

@@ -62,18 +62,12 @@ io.sockets.on('connection', (socket) => {
         }
     } )
 
-    socket.on('flip_coin', (msg) => {
-        const game_id = users[socket.id].game_id
-        if (game_id) {
-            runningGames[game_id].flipCoin(msg.row, msg.col)
-            socket.emit('game_update',  runningGames[game_id])
-        }
-    })
+   
 
-    socket.on('add_or_flip_coin', (msg) => {
+    socket.on('add_or_flip_coin', (player_data) => {
         const game_id = users[socket.id].game_id
         if (game_id) {
-            runningGames[game_id].addOrFlipCoin(msg.row, msg.col, msg.player_number)
+            runningGames[game_id].addOrFlipCoin(player_data.pos, player_data.player_number)
             socket.emit('game_update',  runningGames[game_id])
         }
     })
@@ -92,8 +86,6 @@ io.sockets.on('connection', (socket) => {
             runningGames[game_id].setPlayerNumber(other_player_number)
         }
     })
-
-
 
     createGameSessionForWaiting()
 })

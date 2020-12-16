@@ -20,7 +20,10 @@ function drawCircle(context, x, y, radius) {
     context.arc(new_x, new_y, 0.5*radius, 0, Math.PI*2, true);
     context.closePath();
     context.fill();
-} 
+}
+
+const is_same_pos = (last_mouse_pos, curr_mouse_pos) => last_mouse_pos.row === curr_mouse_pos.row && last_mouse_pos.col == curr_mouse_pos.col
+
 
 
 jQuery(document).ready(async function($) {
@@ -46,17 +49,14 @@ jQuery(document).ready(async function($) {
         const row = Math.floor(mouse_position.y / cell_size_pixels)
 
         const current_click_cell_pos = {row, col}
-        const is_same_pos = (last_mouse_pos, curr_mouse_pos) => last_mouse_pos.row === curr_mouse_pos.row && last_mouse_pos.col == curr_mouse_pos.col
         const is_same_cell = is_same_pos(latest_click_cell_pos, current_click_cell_pos)
-        console.log(is_same_cell)
-        console.log(is_double_tapping)
-
+        const player_data = {pos:current_click_cell_pos, player_number}
+       
         if ( is_double_tapping && is_same_cell ) {
-            console.log('Shoudl be removing')
-            socket.emit('remove_coin', {pos: {row, col}, player_number })
+            socket.emit('remove_coin', player_data)
         }
         else {
-            socket.emit('add_or_flip_coin', {row, col, player_number})
+            socket.emit('add_or_flip_coin', player_data)
         }
 
         if (!is_double_tapping) {
