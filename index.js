@@ -67,7 +67,7 @@ io.sockets.on('connection', (socket) => {
     socket.on('add_or_flip_coin', (player_data) => {
         const game_id = users[socket.id].game_id
         if (game_id) {
-            runningGames[game_id].addOrFlipCoin(player_data.pos, player_data.player_number)
+            runningGames[game_id].addOrFlipCoin(player_data.pos, player_data.player_number, player_data.flip_immediately)
             socket.emit('game_update',  runningGames[game_id])
 
         }

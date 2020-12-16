@@ -8,6 +8,8 @@ let player_turn = false
 let cell_size_pixels = 48
 let mouse_position
 
+let flip_immediately = false
+
 const BUTTON_STATES_TEXT = {
     WAIT: 'Wait turn',
     ACTIVE: 'End turn'
@@ -59,7 +61,7 @@ jQuery(document).ready(async function($) {
 
         const current_click_cell_pos = {row, col}
         const is_same_cell = isSamePos(latest_click_cell_pos, current_click_cell_pos)
-        const player_data = {pos:current_click_cell_pos, player_number}
+        const player_data = {pos:current_click_cell_pos, player_number, flip_immediately}
        
         if ( is_double_tapping && is_same_cell ) {
            // socket.emit('remove_coin', player_data)
@@ -88,8 +90,13 @@ jQuery(document).ready(async function($) {
 
     window.addEventListener('keypress', function(e) {
         //S or E
-        if (e.keyCode === 115 || e.keyCode === 101 ) {
+        if (e.key === 'e' || e.key === 's' ) {
             socket.emit('switch_to_other_player', player_number)
+        }
+
+        if (e.shiftKey && e.key === 'F') {
+            flip_immediately = !flip_immediately
+            console.log(`We are${flip_immediately ? '' : ' not'} flipping immediately`)
         }
     })
 
