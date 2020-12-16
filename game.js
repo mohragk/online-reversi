@@ -67,8 +67,10 @@ Game.prototype.setPlayerNumber = function(player_number) {
 
 Game.prototype.shallPass = function(player_number) {
      // Not allowed to change board when not player's turn
-     if (player_number !== this.current_player_number) return false
-     if (this.current_player_moves_state == PLAYER_MOVES_STATE.IDLE) return false
+     if (player_number !== this.current_player_number) 
+        return false
+     if (this.current_player_moves_state == PLAYER_MOVES_STATE.IDLE) 
+        return false
     
      return true
 }
@@ -79,14 +81,14 @@ const isSamePos = (pos_a, pos_b) => {
 }
 
 Game.prototype.removeCoin = function(grid_pos, player_number) {
-    if (!this.shallPass(player_number)) 
+    if ( ! this.shallPass(player_number) ) 
         return
-        
-    if (this.last_placed_coin_pos == null) 
+
+    if ( this.last_placed_coin_pos == null ) 
         return 
 
     
-    if (this.isSamePos(this.last_placed_coin_pos, grid_pos)) {
+    if ( this.isSamePos(this.last_placed_coin_pos, grid_pos) ) {
         const {row, col} = grid_pos
         
         this.grid[ row * this.grid_dim + col ] = CELL_TYPES.EMPTY
@@ -97,14 +99,12 @@ Game.prototype.removeCoin = function(grid_pos, player_number) {
         // Reset state to be able add coin
         this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
     }
- 
-   
 }
 
 
 
 Game.prototype.addOrFlipCoin = function(grid_pos, player_number, immediate_mode = false) {
-    if (!this.shallPass(player_number)) 
+    if ( ! this.shallPass(player_number) ) 
         return
 
     
