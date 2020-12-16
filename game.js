@@ -112,6 +112,7 @@ Game.prototype.addOrFlipCoin = function(grid_pos, player_number, immediate_mode 
         // First flip, determines working direction
         if (this.current_player_moves_state === PLAYER_MOVES_STATE.FLIP_COIN) {
 
+            if (!this.isValidFirstFlip(grid_pos)) return
 
             if (isSamePos(this.last_placed_coin_pos, grid_pos)) return
 
@@ -217,17 +218,16 @@ const direction = (last_placed_pos, flip_pos) => {
     return {row_dir, col_dir}
 }
 
-
-Game.prototype.createFlippableList = function(first_flip_pos) {
-    
+Game.prototype.isValidFirstFlip = function(flip_pos) {
     if (this.last_placed_coin_pos !== null) {   
-        const new_dir = direction(this.last_placed_coin_pos, first_flip_pos)
-        
+        const new_dir = direction(this.last_placed_coin_pos, flip_pos)
+
+        // only allowed to flip neighbouring coin
+        if (new_dir.row_dir > 1 || new_dir.col_dir > 1) return false
 
         // Iteratively check if next coins are flippable
-        // Save those in flippable list
-        let cell_pos = {...first_flip_pos}
-        let i = 0
+
+        let cell_pos = {...flip_pos}
         while(true) {
             cell_pos.row += new_dir.row_dir 
             cell_pos.col += new_dir.col_dir 
@@ -242,22 +242,59 @@ Game.prototype.createFlippableList = function(first_flip_pos) {
             }
 
             // Not enclosing
-            if (cell_value === CELL_TYPES.EMPTY || i > this.grid_dim) {
+            if (cell_value === CELL_TYPES.EMPTY) {
+                return false
+            }
+            
+            if (cell_value !== this.current_player_number) {
+                continue
+            }
+            else {
+                return true
+            }
+            
+            
+        }
+    }
+}
+
+Game.prototype.createFlippableList = function(first_flip_pos) {
+    
+    if (this.last_placed_coin_pos !== null) {   
+        const new_dir = direction(this.last_placed_coin_pos, first_flip_pos)
+        
+
+        // Iteratively check if next coins are flippable
+        // Save those in flippable list
+        let cell_pos = {...first_flip_pos}
+        while(true) {
+            cell_pos.row += new_dir.row_dir 
+            cell_pos.col += new_dir.col_dir 
+            const cell_value = this.grid[ cell_pos.row * this.grid_dim + cell_pos.col ]
+            
+            // OOB
+            if (cell_pos.row < 0 && cell_pos.row >= this.grid_dim) {
+                if (cell_pos.col < 0 && cell_pos.col >= this.grid_dim) {
+                    this.flippable_coins = []
+                    return false    
+                }
+            }
+
+            // Not enclosing
+            if (cell_value === CELL_TYPES.EMPTY) {
                 this.flippable_coins = []
                 return false
             }
             
             if (cell_value !== this.current_player_number) {
                 this.flippable_coins.push({...cell_pos})
-                
             }
             else {
                 this.last_placed_coin_pos = null
                 return true
-                break
             }
             
-            i++
+            
         }
     }
 }
