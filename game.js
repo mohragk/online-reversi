@@ -76,10 +76,8 @@ Game.prototype.removeCoin = function(grid_pos, player_number) {
     if (this.current_player_moves_state == PLAYER_MOVES_STATE.IDLE) return
 
     const {row, col} = grid_pos
- 
-    let current_cell_value = this.grid[ row * this.grid_dim + col ]
-    if (current_cell_value !== CELL_TYPES.EMPTY) {
 
+    if (this.last_placed_coin_pos.row == row && this.last_placed_coin_pos.col == col) {
         this.grid[ row * this.grid_dim + col ] = CELL_TYPES.EMPTY
 
         this.last_placed_coin_pos = null
@@ -88,6 +86,8 @@ Game.prototype.removeCoin = function(grid_pos, player_number) {
         // Reset state to be able add coin
         this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
     }
+ 
+   
 }
 
 Game.prototype.addOrFlipCoin = function(grid_pos, player_number) {
@@ -107,7 +107,9 @@ Game.prototype.addOrFlipCoin = function(grid_pos, player_number) {
             const new_cell_value = current_cell_value == CELL_TYPES.CONTAINS_GREEN ? CELL_TYPES.CONTAINS_RED :  CELL_TYPES.CONTAINS_GREEN
             this.grid[ row * this.grid_dim + col ] = new_cell_value
 
-            this.createFlippableList(grid_pos)
+            //this.createFlippableList(grid_pos)
+            this.flipFlippableCoinsInRow(grid_pos)
+
 
             if (this.flippable_coins.length > 0) {
                 this.current_player_moves_state = PLAYER_MOVES_STATE.FLIP_REST_COIN
@@ -192,14 +194,17 @@ Game.prototype.isValidFlip = function(flip_pos) {
     return false
 }
 
+
+// Determine enclosure line direction
+const direction = (last_placed_pos, flip_pos) => {
+    const row_dir = flip_pos.row - last_placed_pos.row
+    const col_dir = flip_pos.col - last_placed_pos.col
+    return {row_dir, col_dir}
+}
+
+
 Game.prototype.createFlippableList = function(first_flip_pos) {
-    // Determine enclosure line direction
-    const direction = (last_placed_pos, flip_pos) => {
-        const row_dir = flip_pos.row - last_placed_pos.row
-        const col_dir = flip_pos.col - last_placed_pos.col
-        return {row_dir, col_dir}
-    }
-   
+    
     if (this.last_placed_coin_pos !== null) {   
         const new_dir = direction(this.last_placed_coin_pos, first_flip_pos)
         
@@ -223,5 +228,29 @@ Game.prototype.createFlippableList = function(first_flip_pos) {
             }
         }
     }
+}
 
+Game.prototype.flipFlippableCoinsInRow = function(first_flip_pos) {
+    if (this.last_placed_coin_pos !== null) {   
+        const new_dir = direction(this.last_placed_coin_pos, first_flip_pos)
+    
+        // Iteratively check if next coins are flippable
+        // Save those in flippable list
+        let cell_pos = {...first_flip_pos}
+        let i = 0
+        while(true) {
+            cell_pos.row += new_dir.row_dir 
+            cell_pos.col += new_dir.col_dir 
+
+            const cell_value = this.grid[ cell_pos.row * this.grid_dim + cell_pos.col ]
+           
+            if (cell_value !== this.current_player_number) {
+                this.grid[ cell_pos.row * this.grid_dim + cell_pos.col ] = this.current_player_number
+            }
+            else {
+                this.last_placed_coin_pos = null
+                break
+            }
+        }
+    }
 }
