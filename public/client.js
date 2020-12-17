@@ -88,7 +88,7 @@ jQuery(document).ready(async function($) {
         socket.emit('remove_coin', {pos: {row, col}, player_number })
     })
 
-    window.addEventListener('keypress', function(e) {
+    window.addEventListener('keydown', function(e) {
         //S or E
         if (e.key === 'e' || e.key === 's' ) {
             socket.emit('switch_to_other_player', player_number)
@@ -97,6 +97,10 @@ jQuery(document).ready(async function($) {
         if (e.shiftKey && e.key === 'F') {
             flip_immediately = !flip_immediately
             console.log(`We are${flip_immediately ? '' : ' not'} flipping immediately`)
+        }
+
+        if (e.ctrlKey && e.key === 'z') {
+            socket.emit('undo')
         }
     })
 
@@ -108,6 +112,12 @@ jQuery(document).ready(async function($) {
     })
     .prop('disabled', true) // hide at start
     .text(BUTTON_STATES_TEXT.WAIT)
+
+
+    $('#undo_button').click(function(e) {
+        e.preventDefault()
+        socket.emit('undo')
+    })
 
     // SOCKET STUFF
     

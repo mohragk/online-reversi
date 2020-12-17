@@ -20,7 +20,11 @@ var Game = function(id) {
     this.last_placed_coin_pos = null
     this.flippable_coins = []
 
+    this.previous_game_state = null
+
     this.reset()
+
+    this.saveState()
 }
 module.exports = Game;
 
@@ -57,12 +61,26 @@ Game.prototype.reset = function() {
         let col = 4
         this.grid[row * this.grid_dim + col] = CELL_TYPES.CONTAINS_RED
     }
+
+   
+    
 }
 
+Game.prototype.saveState = function() {
+    this.previous_game_state = {
+        grid: [...this.grid],
+        player_moves_state: this.current_player_moves_state
+    }
 
+    console.log(this.previous_game_state)
+}
 Game.prototype.setPlayerNumber = function(player_number) {
     this.current_player_number = player_number
     this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
+    this.saveState()
+
+    
+
 }
 
 Game.prototype.shallPass = function(player_number) {
@@ -76,6 +94,12 @@ Game.prototype.shallPass = function(player_number) {
 }
 
 
+Game.prototype.resetToPreviousState = function() {
+    this.grid = [...this.previous_game_state.grid]
+    this.current_player_moves_state = this.previous_game_state.player_moves_state
+    this.flippable_coins = []
+}
+
 const isSamePos = (pos_a, pos_b) => {
     return pos_a.row === pos_b.row && pos_a.col === pos_b.col
 }
@@ -88,7 +112,7 @@ Game.prototype.removeCoin = function(grid_pos, player_number) {
         return 
 
     
-    if ( this.isSamePos(this.last_placed_coin_pos, grid_pos) ) {
+    if ( isSamePos(this.last_placed_coin_pos, grid_pos) ) {
         const {row, col} = grid_pos
         
         this.grid[ row * this.grid_dim + col ] = CELL_TYPES.EMPTY

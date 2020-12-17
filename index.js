@@ -62,6 +62,16 @@ io.sockets.on('connection', (socket) => {
         }
     } )
 
+
+    socket.on('undo', () => {
+        console.log(`Client ${socket.id} requested undo`)
+        const game_id = users[socket.id].game_id
+        if (game_id) {
+            runningGames[game_id].resetToPreviousState()
+            socket.emit('game_update',  runningGames[game_id])
+
+        }
+    })
    
 
     socket.on('add_or_flip_coin', (player_data) => {

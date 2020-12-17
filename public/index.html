@@ -13,7 +13,7 @@
                 margin: 24px 0;
             }
 
-            #end_turn_button {
+            #end_turn_button, #undo_button {
                 background-color: blue;
                 border: none;
                 color: white;
@@ -28,6 +28,10 @@
             #end_turn_button[disabled]{
                 background-color: #cccccc;
                 color: #666666;
+            }
+
+            #undo_button {
+                background-color: #555;
             }
 
             .disable-dbl-tap-zoom {
@@ -49,7 +53,12 @@
             <div id="player_data">Waiting for other player</div>
             <div id="player_score"></div>
             <canvas id="grid_canvas" class="disable-dbl-tap-zoom" width="600" height="600"></canvas>
-            <button id="end_turn_button">End turn</button>
+            <div style="display: flex;">
+                <div style="float:left; width:50%; padding: 12px;"><button id="end_turn_button">End turn</button></div>   
+                <div style="float:left; width:50%; padding: 12px"><button id="undo_button">Undo</button></div>
+            </div>
+            
+           
         </div>
 
     </body>
