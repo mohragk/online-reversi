@@ -62,7 +62,6 @@ Game.prototype.reset = function() {
         this.grid[row * this.grid_dim + col] = CELL_TYPES.CONTAINS_RED
     }
 
-   
     
 }
 
@@ -71,16 +70,11 @@ Game.prototype.saveState = function() {
         grid: [...this.grid],
         player_moves_state: this.current_player_moves_state
     }
-
-    console.log(this.previous_game_state)
 }
 Game.prototype.setPlayerNumber = function(player_number) {
     this.current_player_number = player_number
     this.current_player_moves_state = PLAYER_MOVES_STATE.ADD_COIN
     this.saveState()
-
-    
-
 }
 
 Game.prototype.shallPass = function(player_number) {
