@@ -5,7 +5,7 @@ const CELL_TYPES = require('./public/cell_types')
 const express = require('express')
 const app = express()
 
-const PORT = process.env.PORT || 3000
+const PORT = 6996
 
 const server = app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}`)
